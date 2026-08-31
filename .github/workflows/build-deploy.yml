@@ -1,0 +1,55 @@
+# Pipeline de publicação automática do CONTRATE A ARTE.
+#
+# Gratuito para sempre enquanto o repositório for PÚBLICO (GitHub Actions não cobra
+# minutos em repositórios públicos). Se o repo virar privado, isso passa a consumir
+# a cota de 2000 min/mês do plano Free.
+#
+# O que falta para este workflow rodar de verdade (ver docs/RUNBOOK.md):
+#   - Secret SHEETS_SERVICE_ACCOUNT_JSON com a credencial da service account do Google
+#   - Secret SHEETS_ID com o id da planilha
+#   - scripts/build_data.py precisa trocar carregar_linhas() para ler da Sheets API
+#   - Conectar este repo ao Cloudflare Pages (o deploy em si é automático via
+#     integração nativa do Pages com GitHub - não precisa de passo de deploy aqui)
+
+name: Publicar site
+
+on:
+  schedule:
+    - cron: "0 12 * * *"   # 1x por dia, 12:00 UTC (~09:00 em Brasília) - ajustar se quiser mais frequência
+  workflow_dispatch: {}      # permite rodar manualmente pelo botão "Run workflow" no GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  build-e-publica:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependências
+        run: |
+          npm ci
+          pip install Pillow
+
+      # - name: Configurar credencial da planilha
+      #   run: echo "${{ secrets.SHEETS_SERVICE_ACCOUNT_JSON }}" > credentials/service-account.json
+
+      - name: Rodar pipeline (planilha -> JSON -> site)
+        run: npm run build
+
+      - name: Commitar dados/fotos atualizados
+        run: |
+          git config user.name "contrate-a-arte-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/_data src/img/artistas
+          git diff --cached --quiet || git commit -m "chore: atualiza perfis publicados [automático]"
+          git push

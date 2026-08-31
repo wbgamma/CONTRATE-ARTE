@@ -1,0 +1,158 @@
+/* CONTRATE A ARTE — paleta reaproveitada do portfólio do Coletivo WB
+   (ver memória: fundo #130D19, violeta #6E2E8A/#A855D9, dourado #F0BE2C, papel #F1EBF5) */
+
+:root {
+  --fundo: #130D19;
+  --fundo-card: #1E1524;
+  --violeta: #6E2E8A;
+  --violeta-claro: #A855D9;
+  --dourado: #F0BE2C;
+  --papel: #F1EBF5;
+  --borda: #3A2A45;
+  --fonte: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --fonte-mono: "Consolas", "SFMono-Regular", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--papel);
+  font-family: var(--fonte);
+  line-height: 1.5;
+}
+
+a { color: var(--violeta-claro); }
+
+header.topo {
+  padding: 1rem;
+  border-bottom: 1px solid var(--borda);
+  position: sticky;
+  top: 0;
+  background: var(--fundo);
+  z-index: 10;
+}
+
+header.topo h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+header.topo h1 .arte { color: var(--dourado); }
+
+.busca {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--fundo-card);
+  color: var(--papel);
+  font-size: 1rem;
+}
+
+.filtros {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+.filtro-chip {
+  flex: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--fundo-card);
+  color: var(--papel);
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filtro-chip[aria-pressed="true"] {
+  background: var(--violeta);
+  border-color: var(--violeta-claro);
+}
+
+main { padding: 1rem; max-width: 720px; margin: 0 auto; }
+
+.grade {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .grade { grid-template-columns: 1fr 1fr; }
+}
+
+.card {
+  display: block;
+  background: var(--fundo-card);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 0.9rem;
+  text-decoration: none;
+  color: var(--papel);
+}
+
+.card .linha-topo { display: flex; gap: 0.75rem; align-items: center; }
+
+.card img.foto {
+  width: 56px; height: 56px; border-radius: 50%;
+  object-fit: cover; background: var(--violeta);
+}
+
+.card h2 { font-size: 1.05rem; margin: 0 0 0.15rem; }
+
+.card .local { font-size: 0.8rem; opacity: 0.75; margin: 0; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+
+.tag {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(110,46,138,0.35);
+  border: 1px solid var(--borda);
+}
+
+.vazio { text-align: center; opacity: 0.7; padding: 2rem 1rem; }
+
+/* --- perfil individual --- */
+
+.perfil-topo { display: flex; gap: 1rem; align-items: center; }
+
+.perfil-topo img.foto {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover; background: var(--violeta);
+}
+
+.perfil-topo h1 { margin: 0; font-size: 1.4rem; }
+
+.secao { margin-top: 1.5rem; }
+.secao h2 { font-size: 0.95rem; color: var(--dourado); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.btn-contato {
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+  padding: 0.9rem;
+  border-radius: 999px;
+  background: var(--dourado);
+  color: #201404;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.contatos-secundarios { display: flex; gap: 0.75rem; justify-content: center; margin-top: 0.75rem; }
+
+.rodape {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}

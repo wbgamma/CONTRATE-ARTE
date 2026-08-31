@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo or "CONTRATE A ARTE" }}</title>
+  <meta name="description" content="Diretório público e gratuito de artistas e profissionais da cultura de Pedro Leopoldo e região.">
+  <link rel="stylesheet" href="/css/estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <h1><a href="/" style="color:inherit;text-decoration:none">CONTRATE <span class="arte">A ARTE</span></a></h1>
+  </header>
+  <main>
+    {{ content | safe }}
+  </main>
+  <p class="rodape">Diretório mantido pelo Coletivo WB — legado do projeto V-Norte II (edital PNAB Pedro Leopoldo). Perfis publicados após revisão administrativa.</p>
+</body>
+</html>

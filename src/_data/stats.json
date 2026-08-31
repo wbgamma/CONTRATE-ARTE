@@ -1,0 +1,13 @@
+{
+  "artistas_publicados": 3,
+  "areas_representadas": 2,
+  "municipios_representados": 1,
+  "perfis_com_portfolio": 1,
+  "lista_areas": [
+    "Audiovisual",
+    "Música"
+  ],
+  "lista_municipios": [
+    "Pedro Leopoldo"
+  ]
+}

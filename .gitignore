@@ -1,0 +1,15 @@
+node_modules/
+_site/
+.cache/
+*.log
+
+# Dados brutos e credenciais - NUNCA versionar
+data/raw_planilha_export.csv
+credentials/
+*.pem
+*.key
+service-account*.json
+.env
+
+# Fotos originais antes de comprimir (ficam so localmente ou no backup privado)
+data/fotos_originais/

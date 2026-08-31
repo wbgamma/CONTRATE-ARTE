@@ -1,0 +1,88 @@
+---
+pagination:
+  data: artistas
+  size: 1
+  alias: artista
+permalink: "/artistas/{{ artista.id }}/"
+layout: base.njk
+eleventyComputed:
+  titulo: "{{ artista.nome_artistico }} — CONTRATE A ARTE"
+---
+
+<a href="/" style="font-size:.85rem;opacity:.7">&larr; voltar à busca</a>
+
+<div class="perfil-topo" style="margin-top:1rem">
+  <img class="foto" src="/img/artistas/{{ artista.foto }}" alt="">
+  <div>
+    <h1>{{ artista.nome_artistico }}</h1>
+    <p class="local">{{ artista.municipio }}{% if artista.regiao %} · {{ artista.regiao }}{% endif %}</p>
+  </div>
+</div>
+
+<div class="tags" style="margin-top:1rem">
+  {% for a in artista.area_atuacao %}<span class="tag">{{ a }}</span>{% endfor %}
+  {% for e in artista.especialidades %}<span class="tag">{{ e }}</span>{% endfor %}
+</div>
+
+{% if artista.bio %}
+<div class="secao">
+  <h2>Sobre</h2>
+  <p>{{ artista.bio }}</p>
+</div>
+{% endif %}
+
+{% if artista.tempo_atuacao_anos %}
+<div class="secao">
+  <h2>Tempo de atuação</h2>
+  <p>{{ artista.tempo_atuacao_anos }} anos</p>
+</div>
+{% endif %}
+
+{% if artista.trajetoria %}
+<div class="secao">
+  <h2>Trajetória</h2>
+  <p>{{ artista.trajetoria }}</p>
+</div>
+{% endif %}
+
+{% if artista.projetos.length %}
+<div class="secao">
+  <h2>Projetos realizados</h2>
+  <ul>{% for p in artista.projetos %}<li>{{ p }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if artista.premiacoes.length %}
+<div class="secao">
+  <h2>Premiações</h2>
+  <ul>{% for p in artista.premiacoes %}<li>{{ p }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if artista.editais.length %}
+<div class="secao">
+  <h2>Participação em editais</h2>
+  <ul>{% for e in artista.editais %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% if artista.portfolio_links.length %}
+<div class="secao">
+  <h2>Portfólio</h2>
+  <ul>{% for link in artista.portfolio_links %}<li><a href="{{ link }}" target="_blank" rel="noopener">{{ link }}</a></li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+{% set whatsapp_link = artista.whatsapp | linkWhatsApp %}
+{% if whatsapp_link %}
+<a class="btn-contato" href="{{ whatsapp_link }}" target="_blank" rel="noopener">Entrar em contato via WhatsApp</a>
+{% elif artista.email %}
+<a class="btn-contato" href="mailto:{{ artista.email }}">Entrar em contato por e-mail</a>
+{% endif %}
+
+<div class="contatos-secundarios">
+  {% if artista.instagram %}<a href="{{ artista.instagram | linkInstagram }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+  {% if artista.youtube %}<a href="{{ artista.youtube }}" target="_blank" rel="noopener">YouTube</a>{% endif %}
+  {% if artista.spotify %}<a href="{{ artista.spotify }}" target="_blank" rel="noopener">Spotify</a>{% endif %}
+  {% if artista.email and whatsapp_link %}<a href="mailto:{{ artista.email }}">E-mail</a>{% endif %}
+</div>

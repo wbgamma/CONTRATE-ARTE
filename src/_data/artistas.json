@@ -1,0 +1,92 @@
+[
+  {
+    "id": "mc-ficticio",
+    "nome_artistico": "MC Fictício",
+    "municipio": "Pedro Leopoldo",
+    "regiao": "Centro",
+    "area_atuacao": [
+      "Música"
+    ],
+    "especialidades": [
+      "MC",
+      "Batalha de rima"
+    ],
+    "bio": "Artista fictício de exemplo para testes do pipeline. Atua com rap e batalhas de improviso.",
+    "tempo_atuacao_anos": "5",
+    "trajetoria": "Começou em batalhas de bairro em 2021, hoje se apresenta em eventos regionais.",
+    "projetos": [
+      "Batalha WB 2024",
+      "Sarau da Praça"
+    ],
+    "premiacoes": [],
+    "editais": [
+      "PNAB 2025"
+    ],
+    "portfolio_links": [],
+    "instagram": "mc.ficticio",
+    "youtube": "",
+    "spotify": "",
+    "outros_links": [],
+    "whatsapp": "5531999990001",
+    "email": "mc.ficticio@example.com",
+    "foto": "mc-ficticio.webp"
+  },
+  {
+    "id": "fotografa-exemplo",
+    "nome_artistico": "Fotógrafa Exemplo",
+    "municipio": "Pedro Leopoldo",
+    "regiao": "Fidalgo (distrito)",
+    "area_atuacao": [
+      "Audiovisual"
+    ],
+    "especialidades": [
+      "Fotografia de evento",
+      "Retrato"
+    ],
+    "bio": "Fotógrafa fictícia usada apenas para validar o pipeline de dados.",
+    "tempo_atuacao_anos": "3",
+    "trajetoria": "Registra eventos culturais da região desde 2023.",
+    "projetos": [
+      "Cobertura V-Norte (exemplo)"
+    ],
+    "premiacoes": [],
+    "editais": [],
+    "portfolio_links": [
+      "https://example.com/portfolio"
+    ],
+    "instagram": "fotografa.exemplo",
+    "youtube": "",
+    "spotify": "",
+    "outros_links": [],
+    "whatsapp": "5531999990002",
+    "email": "",
+    "foto": "fotografa-exemplo.webp"
+  },
+  {
+    "id": "dj-amostra",
+    "nome_artistico": "DJ Amostra",
+    "municipio": "Pedro Leopoldo",
+    "regiao": "Teotônio Batista de Freitas",
+    "area_atuacao": [
+      "Música"
+    ],
+    "especialidades": [
+      "DJ",
+      "Produção musical"
+    ],
+    "bio": "Perfil mínimo, só com os campos obrigatórios preenchidos - testa o caso de perfil incompleto.",
+    "tempo_atuacao_anos": "",
+    "trajetoria": "",
+    "projetos": [],
+    "premiacoes": [],
+    "editais": [],
+    "portfolio_links": [],
+    "instagram": "",
+    "youtube": "",
+    "spotify": "",
+    "outros_links": [],
+    "whatsapp": "5531999990004",
+    "email": "",
+    "foto": "sem-foto.svg"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "name": "contrate-a-arte",
+  "version": "0.1.0",
+  "description": "Diretorio publico e gratuito de artistas e profissionais da cultura para producao e contratacao.",
+  "private": true,
+  "scripts": {
+    "build:data": "python scripts/build_data.py",
+    "build:site": "eleventy",
+    "build": "npm run build:data && npm run build:site",
+    "dev": "eleventy --serve"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  }
+}

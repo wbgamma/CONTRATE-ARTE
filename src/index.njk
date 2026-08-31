@@ -1,0 +1,43 @@
+---
+layout: base.njk
+titulo: "CONTRATE A ARTE — encontre profissionais da cultura"
+---
+
+<input type="search" id="busca" class="busca" placeholder="Buscar por nome, área ou especialidade…" aria-label="Buscar artistas">
+
+<div class="filtros" id="filtros-area">
+  <button class="filtro-chip" data-filtro-area="" aria-pressed="true">Todas as áreas</button>
+  {% for area in stats.lista_areas %}
+  <button class="filtro-chip" data-filtro-area="{{ area }}" aria-pressed="false">{{ area }}</button>
+  {% endfor %}
+</div>
+
+<p style="opacity:.7;font-size:.85rem;margin-top:1rem">
+  {{ stats.artistas_publicados }} perfis publicados · {{ stats.areas_representadas }} áreas · {{ stats.municipios_representados }} municípios
+</p>
+
+<div class="grade" id="grade-resultados">
+  {% for artista in artistas %}
+  <a class="card" href="/artistas/{{ artista.id }}/"
+     data-nome="{{ artista.nome_artistico | lower }}"
+     data-areas="{{ artista.area_atuacao | join(',') | lower }}"
+     data-especialidades="{{ artista.especialidades | join(',') | lower }}"
+     data-municipio="{{ artista.municipio | lower }}">
+    <div class="linha-topo">
+      <img class="foto" src="/img/artistas/{{ artista.foto }}" alt="" loading="lazy">
+      <div>
+        <h2>{{ artista.nome_artistico }}</h2>
+        <p class="local">{{ artista.municipio }}{% if artista.regiao %} · {{ artista.regiao }}{% endif %}</p>
+      </div>
+    </div>
+    <div class="tags">
+      {% for a in artista.area_atuacao %}<span class="tag">{{ a }}</span>{% endfor %}
+      {% for e in artista.especialidades %}<span class="tag">{{ e }}</span>{% endfor %}
+    </div>
+  </a>
+  {% endfor %}
+</div>
+
+<p class="vazio" id="msg-vazio" hidden>Nenhum perfil encontrado com esses termos.</p>
+
+<script src="/js/busca.js" defer></script>
