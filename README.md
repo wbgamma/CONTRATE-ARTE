@@ -18,9 +18,9 @@ Toda peça deste projeto foi escolhida para não ter mensalidade:
 | Python (`scripts/build_data.py`) | planilha aprovada → JSON público + fotos comprimidas | R$0 |
 | GitHub Actions (repo **público**) | roda o script automaticamente a cada aprovação | R$0 (ilimitado em repo público) |
 | Eleventy | gera o site estático a partir do JSON | R$0 |
-| Cloudflare Pages | hospedagem + SSL | R$0 |
+| Cloudflare Pages/Workers (assets estáticos) | hospedagem + SSL | R$0 |
 | Cloudflare Web Analytics | métricas de acesso, sem cookies | R$0 |
-| Domínio próprio | opcional | ~R$40-60/ano *(único item não-R$0; por ora usamos o subdomínio gratuito `*.pages.dev`)* |
+| Domínio próprio | opcional | ~R$40-60/ano *(único item não-R$0; por ora usamos o subdomínio gratuito `*.workers.dev`)* |
 
 Se algum dia uma peça exigir pagamento, o critério é: procurar alternativa gratuita
 primeiro, documentar a troca, nunca aceitar dependência de mensalidade em silêncio.
@@ -53,17 +53,21 @@ docs/                    documentação para quem for administrar o projeto no f
 .github/workflows/       automação (GitHub Actions) que publica o site sozinho
 ```
 
-## Estado atual: Fase 0 (spike) concluída
+## Estado atual
 
-Provado ponta a ponta com dados fictícios: planilha → filtro de aprovação/consentimento
-→ JSON → fotos em webp comprimidas → site estático → busca client-side → botão de
-contato com link de WhatsApp correto.
+- **Fase 0 (spike) concluída:** pipeline provado ponta a ponta com dados fictícios —
+  planilha → filtro de aprovação/consentimento → JSON → fotos em webp comprimidas →
+  site estático → busca client-side → botão de contato com link de WhatsApp correto.
+- **No ar em produção:** https://contrate-a-arte.batalhawb2-0.workers.dev (ainda com os
+  3 perfis fictícios do CSV mock). Deploy automático a cada push na `main` — ver
+  [docs/CLOUDFLARE-PAGES.md](docs/CLOUDFLARE-PAGES.md) (a URL saiu no formato
+  `*.workers.dev`, o formato unificado atual do Cloudflare para sites estáticos
+  conectados ao Git; mesma infraestrutura gratuita do Pages clássico).
 
 **Próximos passos (exigem ações do usuário, não posso criar contas por vocês):**
-1. Criar o Google Form de cadastro + a planilha de administração (conta institucional do
-   coletivo, não pessoal).
-2. Criar o repositório no GitHub (**público**, é o que garante Actions ilimitado grátis).
-3. Criar a conta Cloudflare Pages e conectar ao repositório.
-4. Criar a service account do Google Sheets API e plugar em `carregar_linhas()`.
+1. Criar o Google Form de cadastro + a planilha de administração (conta institucional
+   do coletivo, não pessoal) — spec pronta em [docs/GOOGLE-FORM.md](docs/GOOGLE-FORM.md).
+2. Criar a service account do Google Sheets API e plugar em `carregar_linhas()`.
+3. Ativar o Cloudflare Web Analytics no projeto (grátis, sem cookies).
 
 Ver [docs/RUNBOOK.md](docs/RUNBOOK.md) para o passo a passo detalhado de administração.

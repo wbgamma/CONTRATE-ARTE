@@ -20,8 +20,14 @@ tabela de custos completa.
    | Build output directory | `_site` |
    | Root directory | `/` |
 5. Clique em **Save and Deploy**. O primeiro build leva 1-2 minutos.
-6. Ao terminar, o Cloudflare dá uma URL gratuita tipo
-   `https://contrate-arte.pages.dev` (ou similar, baseado no nome do projeto/repo).
+6. Ao terminar, o Cloudflare dá uma URL gratuita. Dependendo de como o projeto foi
+   criado, ela pode sair como `*.pages.dev` (fluxo clássico) ou `*.workers.dev`
+   (fluxo unificado atual de "Workers com assets estáticos") — é a mesma
+   infraestrutura gratuita nos dois casos. **Se a URL aparecer como "No URLs enabled"
+   / domínio "Disabled"** na aba Overview do projeto, vá em **Domains** (ou clique no
+   toggle ao lado do domínio `workers.dev`) e habilite — o deploy pode ter funcionado
+   sem a URL pública estar ativa por padrão.
+   URL em produção deste projeto: https://contrate-a-arte.batalhawb2-0.workers.dev
 7. **Ative o Cloudflare Web Analytics** (Workers & Pages → seu projeto → Analytics →
    Web Analytics → Enable): grátis, sem cookies, dá pageviews/visitas pro relatório
    de impacto do edital.
