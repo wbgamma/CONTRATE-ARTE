@@ -22,7 +22,9 @@ Quando a planilha real existir, troque a função `carregar_linhas()` por uma ch
 from __future__ import annotations
 
 import csv
+import io
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -32,7 +34,7 @@ from pathlib import Path
 try:
     from PIL import Image
 except ImportError:
-    print("Pillow não instalado. Rode: pip install Pillow", file=sys.stderr)
+    print("Pillow não instalado. Rode: pip install -r requirements.txt", file=sys.stderr)
     raise
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -96,12 +98,89 @@ def lista_de(campo: str) -> list[str]:
 
 
 def carregar_linhas() -> list[dict]:
-    """Fonte dos dados. Hoje: CSV local. Amanhã: Google Sheets API (trocar só aqui)."""
+    """Fonte dos dados: planilha real via Sheets API, se as credenciais estiverem
+    configuradas (SHEETS_ID + SHEETS_SERVICE_ACCOUNT_JSON); senão cai pro CSV mock
+    local, útil pra desenvolvimento/teste sem tocar na planilha de verdade."""
+    if os.environ.get("SHEETS_ID") and os.environ.get("SHEETS_SERVICE_ACCOUNT_JSON"):
+        print("Lendo respostas da planilha real via Sheets API...")
+        return [normalizar_linha_sheets(l) for l in carregar_linhas_sheets()]
+
+    print("SHEETS_ID/SHEETS_SERVICE_ACCOUNT_JSON não configurados — usando CSV mock local.")
     if not CSV_ENTRADA.exists():
         print(f"Arquivo não encontrado: {CSV_ENTRADA}", file=sys.stderr)
         sys.exit(1)
     with CSV_ENTRADA.open(encoding="utf-8") as f:
         return list(csv.DictReader(f))
+
+
+def carregar_linhas_sheets() -> list[dict]:
+    """Lê a planilha real via Google Sheets API (service account). Cada linha vem
+    como um dict com os cabeçalhos exatos das perguntas do Google Form."""
+    import gspread
+    from google.oauth2.service_account import Credentials
+
+    escopos = [
+        "https://www.googleapis.com/auth/spreadsheets.readonly",
+        "https://www.googleapis.com/auth/drive.readonly",
+    ]
+    credenciais = Credentials.from_service_account_info(
+        json.loads(os.environ["SHEETS_SERVICE_ACCOUNT_JSON"]), scopes=escopos
+    )
+    cliente = gspread.authorize(credenciais)
+    planilha = cliente.open_by_key(os.environ["SHEETS_ID"])
+    aba = planilha.sheet1
+    return aba.get_all_records()
+
+
+def _campo_multivalor(texto: str, separador: str) -> str:
+    """Junta um campo multi-valor da planilha real (vírgula ou quebra de linha,
+    dependendo da pergunta) no mesmo formato '|' que lista_de() já espera."""
+    if not texto:
+        return ""
+    return "|".join(p.strip() for p in texto.split(separador) if p.strip())
+
+
+# Mapeia o cabeçalho exato de cada pergunta do Forms pra chave interna do script,
+# e diz se o campo é multi-valor separado por vírgula ou por quebra de linha
+# (ver docs/GOOGLE-FORM.md, seção "Nota técnica"). Ajustar aqui se o texto de
+# alguma pergunta mudar no Forms — os dois precisam ficar em sincronia.
+MAPA_COLUNAS_SHEETS = {
+    "Nome artístico": ("nome_artistico", None),
+    "Município": ("municipio", None),
+    "Bairro, distrito ou região (sem endereço exato)": ("regiao", None),
+    "Área de atuação": ("area_atuacao", ","),
+    "Especialidades (ex.: DJ, Fotógrafo, MC, Grafiteiro, Produtor musical...)": ("especialidades", ","),
+    "Bio curta (até ~300 caracteres)": ("bio", None),
+    "Há quantos anos atua?": ("tempo_atuacao_anos", None),
+    "Conte sua trajetória": ("trajetoria", None),
+    "Projetos realizados (um por linha)": ("projetos", "\n"),
+    "Premiações (um por linha)": ("premiacoes", "\n"),
+    "Participação em editais/projetos culturais (um por linha)": ("editais", "\n"),
+    "Link(s) de portfólio (um por linha)": ("portfolio_links", "\n"),
+    "Instagram (usuário, sem @)": ("instagram", None),
+    "YouTube (link do canal)": ("youtube", None),
+    "Spotify (link do perfil/artista)": ("spotify", None),
+    "Outros links relevantes (um por linha)": ("outros_links", "\n"),
+    "WhatsApp profissional (com DDD)": ("whatsapp", None),
+    "E-mail profissional": ("email", None),
+    "Foto de perfil": ("foto_arquivo", None),
+}
+
+
+def normalizar_linha_sheets(bruta: dict) -> dict:
+    """Converte uma linha crua da planilha (cabeçalhos = texto das perguntas do
+    Forms) pro mesmo formato de dict que linha_valida()/montar_artista() já
+    entendem (mesmas chaves e convenções do CSV mock)."""
+    linha: dict = {"status": str(bruta.get("Status", "")).strip()}
+
+    for cabecalho, (chave, separador) in MAPA_COLUNAS_SHEETS.items():
+        valor = str(bruta.get(cabecalho, "") or "").strip()
+        linha[chave] = _campo_multivalor(valor, separador) if separador else valor
+
+    consentimento = str(bruta.get("Consentimento de publicação", "")).strip()
+    linha["consentimento_publicacao"] = "TRUE" if consentimento else "FALSE"
+
+    return linha
 
 
 def linha_valida(linha: dict) -> tuple[bool, str]:
@@ -118,13 +197,73 @@ def linha_valida(linha: dict) -> tuple[bool, str]:
     return True, ""
 
 
-def processar_foto(nome_arquivo: str, slug: str) -> str:
-    """Comprime a foto para webp, lado maior <= FOTO_LADO_MAX. Retorna o nome do arquivo final."""
-    if not nome_arquivo:
+_CREDENCIAIS_GOOGLE = None
+
+
+def _credenciais_google():
+    """Credenciais da service account, reaproveitadas entre chamadas à Sheets e Drive API."""
+    global _CREDENCIAIS_GOOGLE
+    if _CREDENCIAIS_GOOGLE is None:
+        from google.oauth2.service_account import Credentials
+
+        _CREDENCIAIS_GOOGLE = Credentials.from_service_account_info(
+            json.loads(os.environ["SHEETS_SERVICE_ACCOUNT_JSON"]),
+            scopes=["https://www.googleapis.com/auth/drive.readonly"],
+        )
+    return _CREDENCIAIS_GOOGLE
+
+
+def _extrair_id_drive(valor: str) -> str | None:
+    """Extrai o id do arquivo a partir do jeito que o Forms grava a resposta de
+    upload na planilha (link completo, ou às vezes só o id)."""
+    m = re.search(r"[-\w]{25,}", valor)
+    return m.group(0) if m else None
+
+
+def _baixar_foto_drive(file_id: str, destino_dir: Path) -> Path | None:
+    """Baixa uma foto enviada via upload do Forms (fica no Drive do dono do
+    formulário). Exige que a service account tenha acesso de leitura ao arquivo/
+    pasta — ver docs/RUNBOOK.md. Retorna None e loga aviso se não conseguir, pra
+    não derrubar o build inteiro por causa de uma foto."""
+    try:
+        from googleapiclient.discovery import build
+        from googleapiclient.http import MediaIoBaseDownload
+
+        servico = build("drive", "v3", credentials=_credenciais_google(), cache_discovery=False)
+        metadados = servico.files().get(fileId=file_id, fields="name,mimeType").execute()
+        extensao = ".jpg" if "jpeg" in metadados.get("mimeType", "") else ".png"
+
+        destino_dir.mkdir(parents=True, exist_ok=True)
+        destino = destino_dir / f"{file_id}{extensao}"
+        buffer = io.BytesIO()
+        downloader = MediaIoBaseDownload(buffer, servico.files().get_media(fileId=file_id))
+        concluido = False
+        while not concluido:
+            _, concluido = downloader.next_chunk()
+        destino.write_bytes(buffer.getvalue())
+        return destino
+    except Exception as e:  # noqa: BLE001 - qualquer falha aqui não pode derrubar o build
+        print(f"  aviso: não foi possível baixar a foto do Drive (id={file_id}): {e}")
+        return None
+
+
+def processar_foto(referencia_foto: str, slug: str) -> str:
+    """Comprime a foto para webp, lado maior <= FOTO_LADO_MAX. Retorna o nome do
+    arquivo final. Aceita tanto um nome de arquivo local (modo CSV mock) quanto
+    uma referência do Drive (modo Sheets API real - link ou id do upload)."""
+    if not referencia_foto:
         return FOTO_PLACEHOLDER
-    origem = FOTOS_ENTRADA / nome_arquivo
+
+    origem = FOTOS_ENTRADA / referencia_foto
     if not origem.exists():
-        print(f"  aviso: foto '{nome_arquivo}' não encontrada em {FOTOS_ENTRADA}, usando placeholder")
+        file_id = _extrair_id_drive(referencia_foto)
+        if file_id and os.environ.get("SHEETS_SERVICE_ACCOUNT_JSON"):
+            origem = _baixar_foto_drive(file_id, FOTOS_ENTRADA)
+        else:
+            origem = None
+
+    if not origem or not Path(origem).exists():
+        print(f"  aviso: foto '{referencia_foto}' não encontrada/baixável, usando placeholder")
         return FOTO_PLACEHOLDER
 
     FOTOS_SAIDA.mkdir(parents=True, exist_ok=True)

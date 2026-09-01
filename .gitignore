@@ -2,6 +2,8 @@ node_modules/
 _site/
 .cache/
 *.log
+__pycache__/
+*.pyc
 
 # Dados brutos e credenciais - NUNCA versionar
 data/raw_planilha_export.csv

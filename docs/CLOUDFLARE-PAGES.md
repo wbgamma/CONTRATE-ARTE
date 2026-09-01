@@ -16,9 +16,16 @@ tabela de custos completa.
    | Campo | Valor |
    |---|---|
    | Framework preset | `None` |
-   | Build command | `pip install -r requirements.txt && npm run build` |
+   | Build command | `npm run build:site` |
    | Build output directory | `_site` |
    | Root directory | `/` |
+
+   **Por que só `build:site` e não `npm run build`:** o passo que fala com a
+   planilha (`build:data`, o script Python) roda só no GitHub Actions, que já
+   commita `src/_data/*.json` e as fotos processadas no repositório. O Cloudflare
+   só constrói o HTML a partir do que já está commitado — se ele rodasse
+   `build:data` também, cairia no CSV mock (sem as credenciais da planilha) e
+   sobrescreveria os dados reais com dados fictícios a cada deploy.
 5. Clique em **Save and Deploy**. O primeiro build leva 1-2 minutos.
 6. Ao terminar, o Cloudflare dá uma URL gratuita. Dependendo de como o projeto foi
    criado, ela pode sair como `*.pages.dev` (fluxo clássico) ou `*.workers.dev`

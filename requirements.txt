@@ -1,1 +1,4 @@
 Pillow==11.*
+gspread==6.*
+google-auth==2.*
+google-api-python-client==2.*
